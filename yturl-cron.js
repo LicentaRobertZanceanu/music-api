@@ -7,7 +7,7 @@ import {
 } from './globals/functions/index.js'
 
 export const ytUrlCron = () => {
-    return cron.schedule('*/15 * * * *', async function () {
+    return cron.schedule('*/10 * * * *', async function () {
         const findResult = await getSongsByConditions(
             {
                 youtubeUrl: '',

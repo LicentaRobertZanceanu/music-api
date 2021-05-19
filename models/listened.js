@@ -5,4 +5,4 @@ const ListenedSchema = new mongoose.Schema({
     userId: { type: String, required: true }
 })
 
-export const ListenedModel = mongoose.model('Listened', ListenedSchema)
+export const ListenedModel = mongoose.model('Listened-songs', ListenedSchema)

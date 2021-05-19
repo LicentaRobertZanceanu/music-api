@@ -20,7 +20,7 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'))
 db.once('open', () => console.log('Connected to MongoDB!'))
 
 app.listen(port, () => {
-    ytUrlCron();
+    // ytUrlCron();
     routes(app);
     console.log(`server is running on port ${port}`)
 })
