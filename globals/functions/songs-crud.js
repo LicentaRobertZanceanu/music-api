@@ -41,13 +41,30 @@ export const getSongsByConditions = (conditions, limit, page) => {
                         }
                     })
                     return
-                } else {
-                    resolve({
-                        status: 200,
-                        result: docs,
-                    })
-                    return
                 }
+                SongsModel.countDocuments(conditions, (countErr, count) => {
+                    if (countErr) {
+                        resolve({
+                            status: 404,
+                            result: {
+                                message: 'Count error!',
+                            }
+                        })
+                    } else {
+                        resolve({
+                            status: 200,
+                            result: {
+                                documents: docs,
+                                total: count,
+                                page,
+                                pageSize: docs.length,
+                                numberOfPages: Math.ceil(count / limit)
+                            },
+                        })
+                        return
+                    }
+                })
+                return
             })
     })
 }

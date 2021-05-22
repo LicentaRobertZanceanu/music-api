@@ -25,7 +25,7 @@ export const getSongsWithoutYtUrl = async (req, res) => {
     const toDelete = []
 
     while (currentIndex < songsLength) {
-        const song = findResult.result[currentIndex]
+        const song = findResult.result.documents[currentIndex]
         const youtubeUrl = await scrapTrackLinkHtml(song.lastFmUrl)
         if (!youtubeUrl) {
             toDelete.push(song)

@@ -16,9 +16,27 @@ export const getArtistsByConditions = (conditions, limit, page) => {
                     })
                     return
                 }
-                resolve({
-                    status: 200,
-                    result: docs
+                ArtistsModel.countDocuments(conditions, (countErr, count) => {
+                    if(countErr) {
+                        resolve({
+                            status: 404,
+                            result: {
+                                message: "Count error!"
+                            }
+                        })
+                        return
+                    }
+                    resolve({
+                        status: 200,
+                        result: {
+                            documents: docs,
+                            total: count,
+                            page,
+                            pageSize: docs.length,
+                            numberOfPages: Math.ceil(count / limit)
+                        },
+                    })
+                    return
                 })
                 return
             })
