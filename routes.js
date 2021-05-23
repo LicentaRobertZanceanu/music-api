@@ -15,7 +15,8 @@ import {
     getLikedSongs,
     likeSong,
     getListenedSongs,
-    listenSong
+    listenSong,
+    getGenresById
 } from "./controllers/index.js"
 import { checkAccessToEndpoint, checkAuthentication } from './globals/functions/index.js'
 
@@ -57,5 +58,7 @@ export const routes = (app) => {
     app.route('/genres')
         .post(checkAuthentication, addGenres)
         .get(checkAuthentication, getGenres)
+    app.route('/genres/:id')
+        .get(checkAuthentication, getGenresById)
 
 }
