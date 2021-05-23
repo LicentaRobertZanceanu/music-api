@@ -1,7 +1,7 @@
 import { getSongById } from '../../globals/functions/index.js'
 
 export const getSongByIdController = async (req, res) => {
-    const findResult = await getSongById(req.params.id)
+    const findResult = await getSongById(req.params.id, req.loggedInUser._id)
     if (findResult.status >= 400) {
         res
             .status(findResult.status)

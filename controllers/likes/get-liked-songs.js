@@ -26,7 +26,7 @@ export const getLikedSongs = async (req, res) => {
     const songsDetails = []
 
     await Promise.all(findRes.result.map(async (record) => {
-        const getSongResult = await getSongById(record.songId)
+        const getSongResult = await getSongById(record.songId, req.loggedInUser._id)
         if (getSongResult.status === 200) {
             songsDetails.push(getSongResult.result)
         }

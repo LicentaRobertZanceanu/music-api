@@ -1,4 +1,4 @@
-import { SongsModel } from '../../models/index.js'
+import { LikesModel, SongsModel } from '../../models/index.js'
 
 export const UpdateOneSong = async (conditions, toUpdate) => {
     return await new Promise(async (resolve, reject) => {
@@ -61,6 +61,7 @@ export const getSongsByConditions = (conditions, limit, page) => {
                                 numberOfPages: Math.ceil(count / limit)
                             },
                         })
+
                         return
                     }
                 })
@@ -69,9 +70,9 @@ export const getSongsByConditions = (conditions, limit, page) => {
     })
 }
 
-export const getSongById = (_id) => {
+export const getSongById = (_id, userId) => {
     return new Promise(async (resolve, reject) => {
-        await SongsModel.findOne({ _id }, (err, doc) => {
+        await SongsModel.findOne({ _id }, async (err, doc) => {
             if (err) {
                 resolve({
                     status: 404,
@@ -81,6 +82,17 @@ export const getSongById = (_id) => {
                 })
                 return
             } else {
+                const likedResult = await checkIfSongIsLiked(doc._id, userId)
+                if (likedResult.status >= 400) {
+                    resolve({
+                        status: 404,
+                        result: {
+                            message: 'Song not found!',
+                        }
+                    })
+                    return
+                }
+                doc["_doc"].liked = !!likedResult.liked
                 resolve({
                     status: 200,
                     result: doc,
@@ -88,5 +100,29 @@ export const getSongById = (_id) => {
                 return
             }
         })
+    })
+}
+
+export const checkIfSongIsLiked = async (songId, userId) => {
+    return new Promise(async (resolve) => {
+        await LikesModel.findOne({
+            songId,
+            userId
+        }, (errLikes, liked) => {
+            if (errLikes) {
+                resolve({
+                    status: 404,
+                    result: {
+                        message: 'Likes err'
+                    }
+                })
+            }
+            resolve({
+                liked: !!liked,
+                status: 200
+            })
+        })
+
+        return
     })
 }
