@@ -28,7 +28,12 @@ export const checkUserAccessToPlaylist = async (loggedInUserId, playlistId) => {
             })
             return
         }
-
+        if (!response) {
+            resolve({
+                status: 404,
+                response: { message: 'No playlist found!' }
+            })
+        }
         if (response.createdBy !== loggedInUserId) {
             resolve({
                 status: 403,

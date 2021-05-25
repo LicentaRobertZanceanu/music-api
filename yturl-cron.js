@@ -44,10 +44,5 @@ export const ytUrlCron = () => {
         await Promise.all(toDelete.map(async song => {
             await DeleteOneSong(song)
         }))
-
-        console.log({
-            toDelete,
-            toUpdate
-        })
     });
 }

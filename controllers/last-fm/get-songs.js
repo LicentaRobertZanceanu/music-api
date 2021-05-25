@@ -34,14 +34,6 @@ const getTrackData = async ({ lastfmId, trackName, trackArtist }) => {
             return
         }
 
-        // const youtubeUrl = await scrapTrackLinkHtml(responseTrack.url)
-
-        // if (!youtubeUrl) {
-        //     console.log('!youtubeurl', youtubeUrl)
-        //     resolve(null)
-        //     return
-        // }
-        // console.log('youtubeurl', youtubeUrl)
         const track = {
             name: responseTrack.name || '',
             lastFmId: responseTrack.mbid || `${trackName}-${trackArtist}`,
@@ -170,22 +162,14 @@ export const getSongs = async (req, res) => {
             const numberOfGenres = genres.length
             while (currentIndex < numberOfGenres) {
                 const genre = genres[currentIndex]
-                console.log('genre', genre)
                 await getLastFmDataByGenre(genre, addToUniqueElementLists)
                 currentIndex += 1
             }
 
-            // console.log('elements', { artists: uniqueMusicResponse.artists, tracks: uniqueMusicResponse.tracks })
-            // res.status(202).json({ artists: uniqueMusicResponse.artists, tracks: uniqueMusicResponse.tracks })
-            // return
-            // res.json({ message: 'done' })
             return ({ artists: uniqueMusicResponse.artists, tracks: uniqueMusicResponse.tracks })
         })
         .then(async elements => {
-            console.log('elements', elements)
-
             const insertArtistsResponse = await InsertArtists(elements.artists)
-            console.log('ir', insertArtistsResponse)
             if (insertArtistsResponse.status !== 200) {
                 res
                     .status(insertArtistsResponse.status)

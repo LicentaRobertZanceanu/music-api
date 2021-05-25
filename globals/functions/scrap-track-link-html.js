@@ -4,7 +4,6 @@ import jsdom from 'jsdom'
 const { JSDOM } = jsdom
 
 export const scrapTrackLinkHtml = async (url) => {
-    console.log('url', url)
     try {
         const response = await got(encodeURI(url))
         if (!response) {

@@ -20,7 +20,6 @@ export const getSongsFromDb = async (req, res) => {
     }
 
     let currentIndex = 0
-    console.log('ffe', findResult.result.documents.length)
     const docs = []
     while (currentIndex < findResult.result.documents.length) {
         const song = findResult.result.documents[currentIndex]

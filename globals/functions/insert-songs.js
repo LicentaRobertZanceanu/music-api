@@ -9,7 +9,6 @@ export const InsertSongs = async (songs) => {
     await SongsModel
         .insertMany(songs)
         .then((data) => {
-            console.log('songs inserted', data)
             response.insertedSongs.push(...data)
         })
         .catch(err => {

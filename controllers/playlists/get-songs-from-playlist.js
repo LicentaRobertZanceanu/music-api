@@ -28,13 +28,12 @@ export const getSongsFromPlaylist = async (req, res) => {
 
     const { isError, response } = songs
 
-    if (isError) {
+    if (isError || !response) {
         res.status(400).json({ message: response })
         return
     }
 
     const songsDetails = []
-
     await Promise.all(response.map(async (record) => {
         const getSongResult = await getSongById(record.songId, req.loggedInUser._id)
         if (getSongResult.status === 200) {

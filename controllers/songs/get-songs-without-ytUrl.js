@@ -45,11 +45,6 @@ export const getSongsWithoutYtUrl = async (req, res) => {
         await DeleteOneSong(song)
     }))
 
-    console.log({
-        toDelete,
-        toUpdate
-    })
-
     res.status(202).json({
         toDelete,
         toUpdate
