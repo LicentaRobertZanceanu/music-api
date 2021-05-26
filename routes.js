@@ -18,7 +18,8 @@ import {
     listenSong,
     getGenresById,
     deletePlaylist,
-    deleteSongFromPlaylist
+    deleteSongFromPlaylist,
+    getPlaylistById
 } from "./controllers/index.js"
 import { checkAccessToEndpoint, checkAuthentication } from './globals/functions/index.js'
 
@@ -42,8 +43,10 @@ export const routes = (app) => {
         .post(checkAuthentication, addPlaylist)
         .get(checkAuthentication, getLoggedInUsersPlaylists)
     app.route('/playlists/:playlistId')
-        .get(checkAuthentication, getSongsFromPlaylist)
+        .get(checkAuthentication, getPlaylistById)
         .delete(checkAuthentication, deletePlaylist)
+    app.route('/playlists/:playlistId/songs')
+        .get(checkAuthentication, getSongsFromPlaylist)
     app.route('/playlists/:playlistId/songs/:songId')
         .post(checkAuthentication, addSongToPlaylist)
         .delete(checkAuthentication, deleteSongFromPlaylist)
