@@ -19,7 +19,9 @@ import {
     getGenresById,
     deletePlaylist,
     deleteSongFromPlaylist,
-    getPlaylistById
+    getPlaylistById,
+    populateLikesAndListenedModels,
+    exportToCsv
 } from "./controllers/index.js"
 import { checkAccessToEndpoint, checkAuthentication } from './globals/functions/index.js'
 
@@ -68,4 +70,9 @@ export const routes = (app) => {
     app.route('/genres/:id')
         .get(checkAuthentication, getGenresById)
 
+    app.route('/populate-models')
+        .post(checkAuthentication, populateLikesAndListenedModels)
+
+    app.route('/export-to-csv')
+        .post(checkAuthentication, exportToCsv)
 }
