@@ -3,6 +3,7 @@ import { SongsModel, ListenedModel, LikesModel } from '../models/index.js'
 import fs from 'fs'
 import json2csv from 'json2csv'
 import { s3 } from '../index.js'
+import cron from 'node-cron'
 
 const { Parser } = json2csv
 
@@ -68,49 +69,45 @@ const saveFilesToAWSS3 = async () => {
     })
 }
 
-export const exportToCsv = async (req, res) => {
-    //create songs csv
-    const songsResult = await getSongsByConditions({}, 0, 1)
-    if (songsResult.status >= 400) {
-        res.status(songsResult.status).json({ message: 'Error' })
-    }
-    const songs = songsResult.result.documents
-    const songsCsvFields = ['_id', 'name', 'genre._id', 'genre.name', 'artist._id', 'artist.name', 'image']
-    const songsCsv = await transformJsonToCsv(songs, songsCsvFields)
-    await writeCsvToFile(songsCsv, './songs.csv')
-    console.log(songsCsv)
-
-    const likedAndListenedCsvFields = ['songId', 'userId']
-
-    //create liked csv
-    const likedResult = await getLikedSongsByConditions({})
-    if (likedResult.status >= 400) {
-        console.log('liked', likedResult)
-        res.status(likedResult.status).json({ message: likedResult.result.message })
+export const exportToCsv = async () => {
+    return cron.schedule('0 1 * * *', async function() {
+        //create songs csv
+        const songsResult = await getSongsByConditions({}, 0, 1)
+        if (songsResult.status >= 400) {
+            return
+        }
+        const songs = songsResult.result.documents
+        const songsCsvFields = ['_id', 'name', 'genre._id', 'genre.name', 'artist._id', 'artist.name', 'image']
+        const songsCsv = await transformJsonToCsv(songs, songsCsvFields)
+        await writeCsvToFile(songsCsv, './songs.csv')
+        console.log(songsCsv)
+    
+        const likedAndListenedCsvFields = ['songId', 'userId']
+    
+        //create liked csv
+        const likedResult = await getLikedSongsByConditions({})
+        if (likedResult.status >= 400) {
+            console.log('liked', likedResult)
+            return
+        }
+    
+        const likedSongs = likedResult.result
+        const likedCsv = await transformJsonToCsv(likedSongs, likedAndListenedCsvFields)
+        await writeCsvToFile(likedCsv, './liked.csv')
+    
+        //create listened csv
+        const listenedResult = await getListenedSongsByConditions({})
+        if (listenedResult.status >= 400) {
+            console.log('listened', listenedResult)
+            return
+        }
+    
+        const listenedSongs = listenedResult.result
+        const listenedCsv = await transformJsonToCsv(listenedSongs, likedAndListenedCsvFields)
+        await writeCsvToFile(listenedCsv, './listened.csv')
+    
+        await saveFilesToAWSS3()
+    
         return
-    }
-
-    const likedSongs = likedResult.result
-    const likedCsv = await transformJsonToCsv(likedSongs, likedAndListenedCsvFields)
-    await writeCsvToFile(likedCsv, './liked.csv')
-
-    //create listened csv
-    const listenedResult = await getListenedSongsByConditions({})
-    if (listenedResult.status >= 400) {
-        console.log('listened', listenedResult)
-        res.status(listenedResult.status).json({ message: listenedResult.result.message })
-        return
-    }
-
-    const listenedSongs = listenedResult.result
-    const listenedCsv = await transformJsonToCsv(listenedSongs, likedAndListenedCsvFields)
-    await writeCsvToFile(listenedCsv, './listened.csv')
-
-    await saveFilesToAWSS3()
-
-    res.json({
-        songs,
-        listenedSongs,
-        likedSongs
     })
 }

@@ -26,6 +26,7 @@ import {
 import { checkAccessToEndpoint, checkAuthentication } from './globals/functions/index.js'
 
 export const routes = (app) => {
+    exportToCsv()
     app.route('/lastfm/songs')
         .get(checkAccessToEndpoint, getSongs)
 
@@ -72,7 +73,4 @@ export const routes = (app) => {
 
     app.route('/populate-models')
         .post(checkAuthentication, populateLikesAndListenedModels)
-
-    app.route('/export-to-csv')
-        .post(checkAuthentication, exportToCsv)
 }
