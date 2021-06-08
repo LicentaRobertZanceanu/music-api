@@ -1,7 +1,7 @@
 import { checkIfSongIsLiked, getSongsByConditions } from '../../globals/functions/index.js'
 
 export const getSongsFromDb = async (req, res) => {
-    const { page, limit, genreId, artistId } = req.query
+    const { page, limit, genreId, artistId, searchBy } = req.query
 
     const conditions = {}
     if (genreId) {
@@ -9,6 +9,11 @@ export const getSongsFromDb = async (req, res) => {
     }
     if (artistId) {
         conditions['artist._id'] = artistId
+    }
+    if (searchBy) {
+        conditions['$text'] = {
+            '$search': searchBy
+        }
     }
 
     const findResult = await getSongsByConditions(conditions, parseInt(limit), parseInt(page))
