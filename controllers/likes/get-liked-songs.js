@@ -1,37 +1,30 @@
 import { LikesModel } from '../../models/index.js'
-import { getSongById } from '../../globals/functions/index.js'
+import { getSongById, getLikedSongsPromise } from '../../globals/functions/index.js'
 
 export const getLikedSongs = async (req, res) => {
-    const findRes = {
-        isError: false,
-        result: null
-    }
+    const { page, limit } = req.query
 
-    await LikesModel.find({ userId: req.loggedInUser._id }, (err, docs) => {
-        if (err) {
-            findRes.isError = true
-            findRes.result = err
-            return
-        }
-
-        findRes.result = docs
-        return
-    })
-
-    if (findRes.isError) {
-        res.status(400).json({ message: err })
+    const findRes = await getLikedSongsPromise(parseInt(limit), parseInt(page), req.loggedInUser._id)
+    if (findRes.status >= 400) {
+        res.status(400).json({ message: findRes.error })
         return
     }
 
     const songsDetails = []
 
-    await Promise.all(findRes.result.map(async (record) => {
+    await Promise.all(findRes.documents.map(async (record) => {
         const getSongResult = await getSongById(record.songId, req.loggedInUser._id)
         if (getSongResult.status === 200) {
             songsDetails.push(getSongResult.result)
         }
     }))
 
-    res.json(songsDetails)
+    res.json({
+        documents: songsDetails,
+        total: findRes.total,
+        page: findRes.page,
+        pageSize: findRes.pageSize,
+        numberOfPages: findRes.numberOfPages
+    })
     return
 }

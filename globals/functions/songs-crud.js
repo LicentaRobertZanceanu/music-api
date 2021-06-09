@@ -167,3 +167,44 @@ export const getListenedSongsPromise = async (limit, page, userId) => {
 
     })
 }
+
+export const getLikedSongsPromise = async (limit, page, userId) => {
+    return new Promise((resolve) => {
+        LikesModel
+            .find({ userId })
+            .limit(limit)
+            .skip((limit * page) - limit)
+            .exec((err, docs) => {
+                if (err) {
+                    resolve({
+                        status: 400,
+                        error: err
+                    })
+                    return
+                }
+                LikesModel
+                    .countDocuments(
+                        { userId },
+                        (countErr, count) => {
+                            if (countErr) {
+                                resolve({
+                                    status: 400,
+                                    error: err
+                                })
+                                return
+                            }
+                            resolve({
+                                documents: docs,
+                                total: count,
+                                pageSize: docs.length,
+                                numberOfPages: Math.ceil(count / limit),
+                                page
+                            })
+
+                            return
+                        })
+                return
+            })
+
+    })
+}
