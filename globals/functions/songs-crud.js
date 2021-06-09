@@ -1,4 +1,4 @@
-import { LikesModel, SongsModel } from '../../models/index.js'
+import { LikesModel, SongsModel, ListenedModel } from '../../models/index.js'
 
 export const UpdateOneSong = async (conditions, toUpdate) => {
     return await new Promise(async (resolve, reject) => {
@@ -124,5 +124,46 @@ export const checkIfSongIsLiked = async (songId, userId) => {
         })
 
         return
+    })
+}
+
+export const getListenedSongsPromise = async (limit, page, userId) => {
+    return new Promise((resolve) => {
+        ListenedModel
+            .find({ userId })
+            .limit(limit)
+            .skip((limit * page) - limit)
+            .exec((err, docs) => {
+                if (err) {
+                    resolve({
+                        status: 400,
+                        error: err
+                    })
+                    return
+                }
+                ListenedModel
+                    .countDocuments(
+                        { userId },
+                        (countErr, count) => {
+                            if (countErr) {
+                                resolve({
+                                    status: 400,
+                                    error: err
+                                })
+                                return
+                            }
+                            resolve({
+                                documents: docs,
+                                total: count,
+                                pageSize: docs.length,
+                                numberOfPages: Math.ceil(count / limit),
+                                page
+                            })
+
+                            return
+                        })
+                return
+            })
+
     })
 }
